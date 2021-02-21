@@ -1,7 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Enzyme from 'enzyme';
+import Adapter from 'enzyme-adapter-react-16';
 import './index.css';
-import App from './App/App';
+import App from './containers/App/index';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
@@ -10,6 +12,8 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+ 
+Enzyme.configure({ adapter: new Adapter() });
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
