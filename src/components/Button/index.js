@@ -10,7 +10,7 @@ export const Button = props => {
       className="points-button"
       color="primary"
       variant="contained"
-      onClick={props.handleClick}
+      onClick={props.onClick}
       {...props}
     >
       {props.children}
