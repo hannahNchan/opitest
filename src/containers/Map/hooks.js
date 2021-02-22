@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, createRef } from 'react';
 import PropTypes from 'prop-types';
 import * as L from 'leaflet';
 
@@ -6,7 +6,7 @@ import * as L from 'leaflet';
 export const useMap = ({ lat, lng, zoom, markers }) => {
   const basemapURL = 'https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png';
 
-  const mapMexRef = useRef();
+  const mapMexRef = useRef(L.featureGroup());
 
   useEffect(() => {
     mapMexRef.current = L.map('map', {
@@ -27,18 +27,30 @@ export const useMap = ({ lat, lng, zoom, markers }) => {
     basemapURL,
   ]);
 
+  function clearMap() {
+    const map = mapMexRef.current;
+    map.stopLocate();
+    map.eachLayer(function (layer) {
+      map.removeLayer(layer);
+    });
+  }
+
   useEffect(() => {
-    markers.forEach(location => {
-      L.circle([location.latitude, location.longitude], {
-        color: `#${location.color}`,
-        fillColor: `#${location.color}`,
-        fillOpacity: 1,
-        radius: 3,
-      },{
-        color: location.color,
+    if (markers.length === 0) {
+      //clearMap();
+    } else {
+      markers.forEach(location => {
+        L.circle([location.latitude, location.longitude], {
+          color: `#${location.color}`,
+          fillColor: `#${location.color}`,
+          fillOpacity: 1,
+          radius: 3,
+        },{
+          color: location.color,
+        })
+          .addTo(mapMexRef.current)
       })
-        .addTo(mapMexRef.current)
-    })
+    }
   },[markers]);
   
   useMap.propTypes = {
