@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -9,6 +9,8 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Chip from '@material-ui/core/Chip';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
+
+import useChecked from './hooks';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -30,13 +32,7 @@ const useStyles = makeStyles((theme) => ({
 
 export const FilterList = (props) => {
   const classes = useStyles();
-  const [checked, setChecked] = React.useState([]);
-  const [list, setList] = React.useState([]);
-
-  useEffect(() => {
-    setList(props.types);
-    setChecked(props.types);
-  }, [props.types]);
+  const { list, checked, handleSetChecked } = useChecked(props);
 
   const handleToggle = (value) => () => {
     const currentIndex = checked.indexOf(value);
@@ -48,7 +44,7 @@ export const FilterList = (props) => {
       newChecked.splice(currentIndex, 1);
     }
 
-    setChecked(newChecked);
+    handleSetChecked(newChecked);
     props.onHandleChange(newChecked);
   };
 

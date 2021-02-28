@@ -1,17 +1,15 @@
-import React, { useEffect } from 'react';
-import 'leaflet/dist/leaflet.css';
-import PropTypes from 'prop-types';
-import useMap from './hooks';
+import React from "react";
+import "leaflet/dist/leaflet.css";
+import PropTypes from "prop-types";
+import useMap from "./hooks";
 
-import './styles.css';
+import "./styles.css";
 
-const Map = (props)  => {
+const Map = (props) => {
   const getMaps = useMap(props);
 
-  return (
-    <div id="map" />
-  );
-}
+  return <div id="map" />;
+};
 
 Map.propTypes = {
   lat: PropTypes.number.isRequired,
@@ -21,4 +19,3 @@ Map.propTypes = {
 };
 
 export default Map;
-

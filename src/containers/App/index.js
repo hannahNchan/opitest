@@ -1,79 +1,90 @@
-import React, { useState, useEffect } from 'react';
+import React from "react";
 
-import api from '../../api';
-import Map from '../Map';
-import Button from '../../components/Button';
-import FilterList from '../../components/FilterList';
+import Button from "../../components/Button";
+import FilterList from "../../components/FilterList";
+import api from "../../api";
+import Map from "../Map";
 
-import { constructQuery, getPercentages } from './utils';
-import './styles.css';
-
+import { constructQuery, getPercentages } from "./utils";
+import "./styles.css";
+import useSettings from "./hooks";
 
 const App = () => {
-  const [markers, setMarkers] = useState([]);
-  const [types, setTypes] = useState([]);
-  const [whereQuery, setWhereQuery] = useState('');
-  const [percentage, setPercentage] = useState([]); 
-  const getQuery = `SELECT latitude, longitude, color, tipo FROM puntos_examen_frontend ${whereQuery}`;
+  const {
+    markers,
+    handleSetMarkers,
+    types,
+    handleSetTypes,
+    handleSetPercentage,
+    percentage,
+    whereQuery,
+    getQuery,
+    activateRequest,
+    handleSetWhereQuery,
+    handleSetActivateRequest,
+  } = useSettings();
 
-  useEffect(() => {
-    if (whereQuery !== '') {
-      handleRequest();
-    }
-  }, [whereQuery]);
+  //const getQuery = `SELECT latitude, longitude, color, tipo FROM ${process.env.REACT_APP_CARTO_TABLE_NAME} ${whereQuery}`;
 
   const handleRequest = async () => {
+    console.log("getQWuery", getQuery);
     const { rows } = await api(getQuery);
 
-    const all = rows.map(item => {
+    const all = rows.map((item) => {
       return {
         [item.tipo]: item.color,
-      }
+      };
     });
-    const getTipo = rows.map(item => item.tipo);
+    const getTipo = rows.map((item) => item.tipo);
     const tipos = new Set(getTipo);
-    
+
     const typeArray = [];
-    tipos.forEach(type => {
-      const numbers = rows.filter(item => item.tipo === type).length;
-      const colors = all.filter(item => item[type])[0][type];
+    tipos.forEach((type) => {
+      const numbers = rows.filter((item) => item.tipo === type).length;
+      const colors = all.filter((item) => item[type])[0][type];
       typeArray.push({ type, numbers, colors });
     });
-    if (whereQuery === '') {
+
+    if (whereQuery === "") {
       const percent = getPercentages(typeArray);
-      setPercentage(percent);
-      setTypes(typeArray);
+      handleSetPercentage(percent);
+      handleSetTypes(typeArray);
     }
-    setMarkers(rows);
+    handleSetMarkers(rows);
   };
+
+  if (activateRequest) {
+    handleRequest();
+    handleSetActivateRequest(false);
+  }
 
   const onHandleClick = () => {
     handleRequest();
+    handleSetActivateRequest(false);
   };
 
-  const handleGetData = type => {
+  const handleGetData = (type) => {
     if (type.length === 0) {
-      setMarkers([]);
+      handleSetMarkers([]);
     } else {
-      const query = constructQuery(type); 
-      setWhereQuery(query);
+      const query = constructQuery(type);
+      handleSetWhereQuery(query);
     }
   };
 
   return (
     <div id="app">
-      <Map
-        markers={markers}
-        zoom={5}
-        lat={19.453603}
-        lng={-99.140410}
-      >
-      </Map>
-      <FilterList types={types} percentage={percentage} onHandleChange={handleGetData}/>
-      <Button disabled={types.length !== 0} onClick={() => onHandleClick()}>OBTENER PUNTOS</ Button>
+      <Map markers={markers} zoom={5} lat={19.453603} lng={-99.14041}></Map>
+      <FilterList
+        types={types}
+        percentage={percentage}
+        onHandleChange={handleGetData}
+      />
+      <Button disabled={types.length !== 0} onClick={() => onHandleClick()}>
+        OBTENER PUNTOS
+      </Button>
     </div>
   );
-}
+};
 
 export default App;
-
